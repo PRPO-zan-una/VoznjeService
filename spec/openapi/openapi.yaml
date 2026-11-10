@@ -13,7 +13,7 @@ paths:
       - $ref: '#/components/parameters/AvtoId'
     post:
       tags: [Voznje]
-      summary: Send journey data from the device
+      summary: Posiljanje podatkov o voznjah
       requestBody:
         required: true
         content:
@@ -31,10 +31,9 @@ paths:
           description: Invalid input
         '404':
           description: User or car not found
-
-      get:
+    get:
       tags: [Voznje]
-      summary: Statistika in seznam voznj
+      summary: Branje seznam vozenj
       parameters:
         - name: od
           in: query
@@ -62,6 +61,7 @@ components:
       name: uporabnikId
       in: path
       required: true
+      description: User ID
       schema:
         type: string
         format: uuid
@@ -69,10 +69,66 @@ components:
       name: avtoId
       in: path
       required: true
+      description: Car ID
       schema:
         type: string
         format: uuid
+
   schemas:
+    VoznjaInput:
+      type: object
+      required:
+        - prevozena_razdalja
+        - povprecna_hitrost
+        - povprecna_poraba
+        - cas
+        - datum
+        - avto_id
+        - uporabnik_id
+      properties:
+        prevozena_razdalja:
+          type: integer
+          format: int64
+          description: Distance travelled
+          example: 12400
+        povprecna_hitrost:
+          type: number
+          format: double
+          description: Average speed
+          example: 38.5
+        povprecna_poraba:
+          type: number
+          format: double
+          description: Average fuel consumption
+          example: 6.8
+        cas:
+          type: string
+          format: date-time
+          example: '2026-11-03T12:36:00Z'
+        datum:
+          type: string
+          format: date
+          example: '2026-11-03'
+        avto_id:
+          type: string
+          format: uuid
+          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+        uporabnik_id:
+          type: string
+          format: uuid
+          example: 7c9e6679-7425-40de-944b-e07fc1f90ae7
+
+    Voznja:
+      allOf:
+        - $ref: '#/components/schemas/VoznjaInput'
+        - type: object
+          required: [id]
+          properties:
+            id:
+              type: string
+              format: uuid
+              example: 9b2f1c3e-6a4d-4e8b-8c1a-2d5e7f9a0b1c
+
     VoznjeStatistika:
       type: object
       properties:
