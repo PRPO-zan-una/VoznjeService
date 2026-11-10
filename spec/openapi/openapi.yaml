@@ -1,0 +1,97 @@
+openapi: "3.0.3"
+info:
+  title: "Voznje Service API"
+  description: "Sprejem podatkov o vožnjah iz naprave in prikaz statistike."
+  version: "1.0.0"
+servers:
+  - url: "http://localhost:8081/api/v1"
+
+paths:
+  /uporabnik/{uporabnikId}/avto/{avtoId}/voznje:
+    parameters:
+      - $ref: '#/components/parameters/UporabnikId'
+      - $ref: '#/components/parameters/AvtoId'
+    post:
+      tags: [Voznje]
+      summary: Send journey data from the device
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VoznjaInput'
+      responses:
+        '201':
+          description: Journey stored
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Voznja'
+        '400':
+          description: Invalid input
+        '404':
+          description: User or car not found
+
+      get:
+      tags: [Voznje]
+      summary: Statistika in seznam voznj
+      parameters:
+        - name: od
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: do
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Statistika voznj
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoznjeStatistika'
+        '404':
+          description: User or car not found
+
+components:
+  parameters:
+    UporabnikId:
+      name: uporabnikId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    AvtoId:
+      name: avtoId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  schemas:
+    VoznjeStatistika:
+      type: object
+      properties:
+        stevilo_voznj:
+          type: integer
+          example: 25
+        skupna_razdalja:
+          type: integer
+          format: int64
+          example: 310500
+        povprecna_hitrost:
+          type: number
+          format: double
+          example: 41.2
+        povprecna_poraba:
+          type: number
+          format: double
+          example: 7.1
+        voznje:
+          type: array
+          items:
+            $ref: '#/components/schemas/Voznja'
